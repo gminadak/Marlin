@@ -2804,13 +2804,18 @@
  * See https://marlinfw.org/docs/configuration/laser_spindle.html for more config details.
  */
 //#define SPINDLE_FEATURE
-//#define LASER_FEATURE
+#define LASER_FEATURE
 #if EITHER(SPINDLE_FEATURE, LASER_FEATURE)
-  #define SPINDLE_LASER_ACTIVE_HIGH     false  // Set to "true" if the on/off function is active HIGH
+  #define SERVO0_PIN                        P2_05    //move servo to BED pin
+  #define SPINDLE_LASER_ENA_PIN             P2_05    // digital pin
+  #define SPINDLE_LASER_PWM_PIN             P2_00    // digital pin - MUST BE HARDWARE PWM
+  //#define SPINDLE_DIR_PIN                 P2_05    // digital pin
+
+  #define SPINDLE_LASER_ACTIVE_HIGH     true   // Set to "true" if the on/off function is active HIGH
   #define SPINDLE_LASER_PWM             true   // Set to "true" if your controller supports setting the speed/power
   #define SPINDLE_LASER_PWM_INVERT      false  // Set to "true" if the speed/power goes up when you want it to go slower
 
-  #define SPINDLE_LASER_FREQUENCY       2500   // (Hz) Spindle/laser frequency (only on supported HALs: AVR and LPC)
+  #define SPINDLE_LASER_FREQUENCY       50000  // (Hz) Spindle/laser frequency (only on supported HALs: AVR and LPC)
 
   /**
    * Speed / Power can be set ('M3 S') and displayed in terms of:
@@ -2818,7 +2823,7 @@
    *  - PERCENT (S0 - S100)
    *  - RPM     (S0 - S50000)  Best for use with a spindle
    */
-  #define CUTTER_POWER_UNIT PWM255
+  #define CUTTER_POWER_UNIT PERCENT
 
   /**
    * Relative Cutter Power
@@ -2888,27 +2893,27 @@
        * board isn't able to generate steps fast enough (and you are using LASER_POWER_INLINE_TRAPEZOID_CONT), increase this.
        * Note that when this is zero it means it occurs every cycle; 1 means a delay wait one cycle then run, etc.
        */
-      //#define LASER_POWER_INLINE_TRAPEZOID_CONT
+      #define LASER_POWER_INLINE_TRAPEZOID_CONT
 
       /**
        * Stepper iterations between power updates. Increase this value if the board
        * can't keep up with the processing demands of LASER_POWER_INLINE_TRAPEZOID_CONT.
        * Disable (or set to 0) to recalculate power on every stepper iteration.
        */
-      //#define LASER_POWER_INLINE_TRAPEZOID_CONT_PER 10
+      #define LASER_POWER_INLINE_TRAPEZOID_CONT_PER  0
 
       /**
        * Include laser power in G0/G1/G2/G3/G5 commands with the 'S' parameter
        */
-      //#define LASER_MOVE_POWER
+      #define LASER_MOVE_POWER
 
       #if ENABLED(LASER_MOVE_POWER)
         // Turn off the laser on G0 moves with no power parameter.
         // If a power parameter is provided, use that instead.
-        //#define LASER_MOVE_G0_OFF
+        #define LASER_MOVE_G0_OFF
 
         // Turn off the laser on G28 homing.
-        //#define LASER_MOVE_G28_OFF
+        #define LASER_MOVE_G28_OFF
       #endif
 
       /**
@@ -2929,8 +2934,8 @@
 
     #else
 
-      #define SPINDLE_LASER_POWERUP_DELAY     50 // (ms) Delay to allow the spindle/laser to come up to speed/power
-      #define SPINDLE_LASER_POWERDOWN_DELAY   50 // (ms) Delay to allow the spindle to stop
+      #define SPINDLE_LASER_POWERUP_DELAY     1  // (ms) Delay to allow the spindle/laser to come up to speed/power
+      #define SPINDLE_LASER_POWERDOWN_DELAY   1  // (ms) Delay to allow the spindle to stop
 
     #endif
   #endif
@@ -3083,12 +3088,12 @@
  * High feedrates may cause ringing and harm print quality.
  */
 //#define PAREN_COMMENTS      // Support for parentheses-delimited comments
-//#define GCODE_MOTION_MODES  // Remember the motion mode (G0 G1 G2 G3 G5 G38.X) and apply for X Y Z E F, etc.
+#define GCODE_MOTION_MODES    // Remember the motion mode (G0 G1 G2 G3 G5 G38.X) and apply for X Y Z E F, etc.
 
 // Enable and set a (default) feedrate for all G0 moves
-//#define G0_FEEDRATE 3000 // (mm/m)
+#define G0_FEEDRATE 6000 // (mm/m)
 #ifdef G0_FEEDRATE
-  //#define VARIABLE_G0_FEEDRATE // The G0 feedrate is set by F in G0 motion mode
+  #define VARIABLE_G0_FEEDRATE // The G0 feedrate is set by F in G0 motion mode
 #endif
 
 /**
