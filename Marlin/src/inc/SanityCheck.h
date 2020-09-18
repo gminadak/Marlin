@@ -692,8 +692,8 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   #elif PROGRESS_MSG_EXPIRE < 0
     #error "PROGRESS_MSG_EXPIRE must be greater than or equal to 0."
   #endif
-#elif ENABLED(LCD_SET_PROGRESS_MANUALLY) && NONE(HAS_GRAPHICAL_LCD, HAS_GRAPHICAL_TFT, EXTENSIBLE_UI)
-  #error "LCD_SET_PROGRESS_MANUALLY requires LCD_PROGRESS_BAR, Graphical LCD, TFT, or EXTENSIBLE_UI."
+#elif ENABLED(LCD_SET_PROGRESS_MANUALLY) && NONE(HAS_GRAPHICAL_LCD, HAS_GRAPHICAL_TFT, HAS_CHARACTER_LCD, EXTENSIBLE_UI)
+  #error "LCD_SET_PROGRESS_MANUALLY requires LCD_PROGRESS_BAR, Character LCD, Graphical LCD, TFT, or EXTENSIBLE_UI."
 #endif
 
 #if !HAS_LCD_MENU && ENABLED(SD_REPRINT_LAST_SELECTED_FILE)
@@ -2182,16 +2182,16 @@ static_assert(hbm[Z_AXIS] >= 0, "HOMING_BUMP_MM.Z must be greater than or equal 
 #endif
 
 /**
- * Make sure features that need to write to the SD card are
- * disabled unless write support is enabled.
+ * Make sure features that need to write to the SD card can
  */
-#if ENABLED(SDCARD_READONLY)
+#if ENABLED(SDCARD_READONLY) && ANY(POWER_LOSS_RECOVERY, BINARY_FILE_TRANSFER, SDCARD_EEPROM_EMULATION)
+  #undef SDCARD_READONLY
   #if ENABLED(POWER_LOSS_RECOVERY)
-    #error "POWER_LOSS_RECOVERY is incompatible with SDCARD_READONLY."
+    #warning "Either disable SDCARD_READONLY or disable POWER_LOSS_RECOVERY."
   #elif ENABLED(BINARY_FILE_TRANSFER)
-    #error "BINARY_FILE_TRANSFER is incompatible with SDCARD_READONLY."
+    #warning "Either disable SDCARD_READONLY or disable BINARY_FILE_TRANSFER."
   #elif ENABLED(SDCARD_EEPROM_EMULATION)
-    #error "SDCARD_EEPROM_EMULATION is incompatible with SDCARD_READONLY."
+    #warning "Either disable SDCARD_READONLY or disable SDCARD_EEPROM_EMULATION."
   #endif
 #endif
 
@@ -3055,8 +3055,6 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
 #if !HAS_GRAPHICAL_LCD
   #if ENABLED(PRINT_PROGRESS_SHOW_DECIMALS)
     #error "PRINT_PROGRESS_SHOW_DECIMALS currently requires a Graphical LCD."
-  #elif ENABLED(SHOW_REMAINING_TIME)
-    #error "SHOW_REMAINING_TIME currently requires a Graphical LCD."
   #endif
 #endif
 
