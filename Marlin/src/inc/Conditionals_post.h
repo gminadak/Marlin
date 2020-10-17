@@ -313,10 +313,14 @@
 #elif ENABLED(MAKRPANEL)
   #define _LCD_CONTRAST_INIT  17
 #elif ENABLED(MINIPANEL)
-  #define _LCD_CONTRAST_INIT  150
+  #define _LCD_CONTRAST_INIT 150
 #elif ENABLED(ZONESTAR_12864OLED)
   #define _LCD_CONTRAST_MIN   64
   #define _LCD_CONTRAST_INIT 128
+  #define _LCD_CONTRAST_MAX  255
+#elif IS_TFTGLCD_PANEL
+  #define _LCD_CONTRAST_MIN    0
+  #define _LCD_CONTRAST_INIT 250
   #define _LCD_CONTRAST_MAX  255
 #endif
 
@@ -379,7 +383,7 @@
 
 #endif
 
-#if ANY(HAS_GRAPHICAL_TFT, LCD_USE_DMA_FSMC, FSMC_GRAPHICAL_TFT, SPI_GRAPHICAL_TFT) || !PIN_EXISTS(SD_DETECT)
+#if ANY(HAS_GRAPHICAL_TFT, LCD_USE_DMA_FSMC, HAS_FSMC_GRAPHICAL_TFT, HAS_SPI_GRAPHICAL_TFT) || !PIN_EXISTS(SD_DETECT)
   #define NO_LCD_REINIT 1  // Suppress LCD re-initialization
 #endif
 
@@ -1972,7 +1976,7 @@
   #define HAS_STEPPER_RESET 1
 #endif
 #if PIN_EXISTS(DIGIPOTSS)
-  #define HAS_DIGIPOTSS 1
+  #define HAS_MOTOR_CURRENT_SPI 1
 #endif
 #if ANY_PIN(MOTOR_CURRENT_PWM_X, MOTOR_CURRENT_PWM_Y, MOTOR_CURRENT_PWM_XY, MOTOR_CURRENT_PWM_Z, MOTOR_CURRENT_PWM_E)
   #define HAS_MOTOR_CURRENT_PWM 1
@@ -2334,7 +2338,7 @@
   #define FILAMENT_CHANGE_SLOW_LOAD_LENGTH 0
 #endif
 
-#if EXTRUDERS > 1 && !defined(TOOLCHANGE_FS_EXTRA_PRIME)
+#if HAS_MULTI_EXTRUDER && !defined(TOOLCHANGE_FS_EXTRA_PRIME)
   #define TOOLCHANGE_FS_EXTRA_PRIME 0
 #endif
 
@@ -2453,9 +2457,9 @@
 /**
  * Buzzer/Speaker
  */
-#if PIN_EXISTS(BEEPER) || EITHER(LCD_USE_I2C_BUZZER, PCA9632_BUZZER)
+#if PIN_EXISTS(BEEPER) || ANY(LCD_USE_I2C_BUZZER, PCA9632_BUZZER)
   #define HAS_BUZZER 1
-  #if NONE(LCD_USE_I2C_BUZZER, PCA9632_BUZZER)
+  #if PIN_EXISTS(BEEPER)
     #define USE_BEEPER 1
   #endif
 #endif
@@ -2483,7 +2487,7 @@
 /**
  * Make sure DOGLCD_SCK and DOGLCD_MOSI are defined.
  */
-#if HAS_GRAPHICAL_LCD
+#if HAS_MARLINUI_U8GLIB
   #ifndef DOGLCD_SCK
     #define DOGLCD_SCK  SCK_PIN
   #endif
@@ -2574,7 +2578,7 @@
 // Force SDCARD_SORT_ALPHA to be enabled for Graphical LCD on LPC1768
 // on boards where SD card and LCD display share the same SPI bus
 // because of a bug in the shared SPI implementation. (See #8122)
-#if defined(TARGET_LPC1768) && ENABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER) && (SCK_PIN == LCD_PINS_D4)
+#if defined(TARGET_LPC1768) && IS_RRD_FG_SC && (SCK_PIN == LCD_PINS_D4)
   #define SDCARD_SORT_ALPHA         // Keep one directory level in RAM. Changing directory levels
                                     // may still glitch the screen, but LCD updates clean it up.
   #undef SDSORT_LIMIT
@@ -2604,22 +2608,26 @@
   #define HAS_FOLDER_SORTING 1
 #endif
 
-#if HAS_SPI_LCD
+#if HAS_WIRED_LCD
   // Get LCD character width/height, which may be overridden by pins, configs, etc.
   #ifndef LCD_WIDTH
-    #if HAS_GRAPHICAL_LCD
+    #if HAS_MARLINUI_U8GLIB
       #define LCD_WIDTH 21
     #else
-      #define LCD_WIDTH TERN(ULTIPANEL, 20, 16)
+      #define LCD_WIDTH TERN(IS_ULTIPANEL, 20, 16)
     #endif
   #endif
   #ifndef LCD_HEIGHT
-    #if HAS_GRAPHICAL_LCD
+    #if HAS_MARLINUI_U8GLIB
       #define LCD_HEIGHT 5
     #else
-      #define LCD_HEIGHT TERN(ULTIPANEL, 4, 2)
+      #define LCD_HEIGHT TERN(IS_ULTIPANEL, 4, 2)
     #endif
   #endif
+#endif
+
+#if BUTTONS_EXIST(EN1, EN2, ENC)
+  #define HAS_ROTARY_ENCODER 1
 #endif
 
 #if !NUM_SERIAL

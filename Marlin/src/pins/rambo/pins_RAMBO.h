@@ -41,7 +41,7 @@
  * Rambo pin assignments
  */
 
-#ifndef __AVR_ATmega2560__
+#if NOT_TARGET(__AVR_ATmega2560__)
   #error "Oops! Select 'Arduino/Genuino Mega or Mega 2560' in 'Tools > Board.'"
 #endif
 
@@ -183,11 +183,11 @@
 //
 // LCD / Controller
 //
-#if HAS_SPI_LCD || TOUCH_UI_ULTIPANEL
+#if HAS_WIRED_LCD || TOUCH_UI_ULTIPANEL
 
   #define KILL_PIN                            80
 
-  #if ENABLED(ULTIPANEL) || TOUCH_UI_ULTIPANEL
+  #if IS_ULTIPANEL || TOUCH_UI_ULTIPANEL
 
     #define LCD_PINS_RS                       70
     #define LCD_PINS_ENABLE                   71
@@ -228,7 +228,7 @@
 
     #endif // !VIKI2 && !miniVIKI
 
-  #else                                           // !NEWPANEL - old style panel with shift register
+  #else                                           // !IS_NEWPANEL - old style panel with shift register
 
     // No Beeper added
     #define BEEPER_PIN                        33
@@ -247,6 +247,6 @@
     #define LCD_PINS_D6                       27
     #define LCD_PINS_D7                       29
 
-  #endif // !NEWPANEL
+  #endif // !IS_NEWPANEL
 
-#endif // HAS_SPI_LCD
+#endif // HAS_WIRED_LCD
